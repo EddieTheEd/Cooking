@@ -1,10 +1,10 @@
 import os
 import subprocess
-import sys
+import shutil
 from io import BytesIO
 from werkzeug.datastructures import FileStorage
 from flask import Flask, render_template, request, send_file
-from io import BytesIO
+from flask_compress import Compress
 
 def booklify(file, opts):
     name = 'input.pdf'
@@ -26,7 +26,7 @@ def booklify(file, opts):
         out, err = p.communicate()
         if err:
             raise RuntimeError(f"Problem getting bounds: {err.decode()}")
-        
+
         lines = out.splitlines()
         bboxes = [s[len(bboxName) + 1 :] for s in lines if s.startswith(bboxName)]
         bounds = [[float(x) for x in bbox.split()] for bbox in bboxes]
@@ -125,8 +125,8 @@ def booklify(file, opts):
 
     return result_pdf
 
-
 app = Flask(__name__)
+Compress(app)
 
 class Options:
     def __init__(self, paper=None, shortedge=False, crop=True, outerMargin=40, innerMargin=150, topMargin=30, bottomMargin=30, signature=0, resolution=72):
