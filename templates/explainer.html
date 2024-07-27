@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cooking</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <style>
+        body {
+          background-color: #f7f7f7;
+          margin: auto;
+        }
+        #block {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          font-family: Arial, sans-serif; 
+          padding-left: 10%;
+          padding-right: 10%;
+        }
+        p {
+          margin: 5px;
+        }
+        img, video {
+          margin: 15px;
+        }
+        #title {
+          text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+  <div id="block">
+    <h1 id="title">How to use?!</h1> 
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='thinking.png') }}" alt="Thinking Image" width="7.5%"> 
+  </div>
+  <div id="block">
+    <p>This tool converts a standard PDF file into a printable booklet. This means it's not exactly readable as a PDF, but when you print it out properly, it will look like a booklet.
+    <strong>This does require a printer which is capable of double sided printing.</strong>
+    Once you have your converted booklet, you may have to change some settings to print it as a booklet.
+    The crucial thing you need to do is print it <strong>double sided</strong>, but flipped on <strong>the long edge</strong>.
+    See a video on how to do this below.</p>
+  </div>
+  <div id="block">
+    <video width="65%" controls>
+      <source src="{{ url_for('static', filename='cookingguide.mp4') }}" type="video/mp4">
+    </video>
+  </div>
+
+  <div id="block">
+    <p><a href="/">Return home</a></p>
+  </div>
+  </body>
+</html>
+

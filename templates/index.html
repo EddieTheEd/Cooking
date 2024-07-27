@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cooking</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <style>
+        body {
+          background-color: #f7f7f7;
+          margin: auto
+        }
+        #mainContent {
+            height: 95vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        #secondaryContent {
+          height: 5vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+        }
+        .drop-zone {
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 40px;
+            width: 80vw;
+            height: 60vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.4s, border-color 0.4s;
+            background-color: white;
+        }
+        .drop-zone.dragover {
+            background-color: #6f9de7;
+            border-color: #aaa;
+        }
+        .drop-zone h1 {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        .drop-zone p {
+            margin: 0;
+            color: #777;
+        }
+        input[type="file"] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+  <div id="mainContent">
+    <div id="dropZone" class="drop-zone">
+        <h1>Cooking with PDFs</h1>
+        <p>Drag and drop or click to select a PDF file to create a printable booklet!</p>
+        <p><a href="explainer" id="explainerLink">How does this work?</a></p>
+        <form id="uploadForm" action="/" method="post" enctype="multipart/form-data">
+            <input id="fileInput" type="file" name="file" />
+        </form>
+    </div> 
+  </div>
+    
+  <div id='secondaryContent'>
+   <p>No rights reserved! See technical details <a href="details">here</a>. Please dont abuse the website! If I end up having to pay because someone botted it, I'll just take it down :(</p>
+  </div>
+    
+
+    <script>
+        let dropZone = document.getElementById("dropZone");
+        let fileInput = document.getElementById("fileInput");
+        let uploadForm = document.getElementById("uploadForm");
+        let explainerLink = document.getElementById("explainerLink");
+
+        dropZone.addEventListener("click", function (e) {
+            if (e.target !== explainerLink) {
+                fileInput.click();
+            }
+        });
+
+        fileInput.addEventListener("change", function () {
+            if (fileInput.files.length > 0) {
+                uploadForm.submit();
+            }
+        });
+
+        dropZone.addEventListener("dragover", function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.classList.add("dragover");
+        });
+
+        dropZone.addEventListener("dragleave", function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.classList.remove("dragover");
+        });
+
+        dropZone.addEventListener("drop", function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.classList.remove("dragover");
+            let files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                uploadForm.submit();
+            }
+        });
+
+        explainerLink.addEventListener("click", function (e) {
+            e.stopPropagation();
+        });
+    </script>
+</body>
+</html>

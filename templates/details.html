@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cooking</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <style>
+        body {
+          background-color: #f7f7f7;
+          margin: auto;
+        }
+        #block {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          font-family: Arial, sans-serif; 
+          padding-left: 10%;
+          padding-right: 10%;
+        }
+        p {
+          margin: 5px;
+        }
+        img, video {
+          margin: 15px;
+        }
+        #title {
+          text-decoration: underline;
+        }
+        #footnoteslist {
+          list-style-type: none;
+          color: #6f6f6f;
+          margin: 0;
+          margin-bottom: 10px;
+        }
+        
+        ol, pre {
+          text-align: left;
+        }
+        pre  {
+          background-color: #c2c2c2; 
+          border-radius: 5px;
+          padding-left: 20px;
+          padding-right: 20px;
+        }
+    </style>
+</head>
+<body>
+  <div id="block">
+    <h1 id="title">The details</h1> 
+  </div>
+  <div id="block">
+    <p><i>Source code in <a href="https://github.com/EddieTheEd/Cooking">this repository</a>.</i></p>
+  </div>
+
+  <div id="block">
+    <h2>The context</h2> 
+  </div>
+  <div id="block">
+    <p>So, imagine this. I'm sitting in physics class, and Mr Norrie is talking about time dilation and muons or something. And then Bento, my beloved, the only glistening beam of hope in a dark, dark world, asks me how I made some WACE questions (for the light test we had earlier) into a booklet. I told him I used '<a href="https://github.com/jenom/pdfbook2">pdfbook2</a>', a Python program. But Bento doesn't want to install Python on his computer (can't blame him really).</p>
+  </div>
+  <div id="block">
+    <p>So, what to do?</p>
+  </div>
+  <div id="block">
+    <p>Well, I first suggested to go on any one of the many websites which offer this. But Bento, my beloved, said that they were too suspicious, and didn't trust them enough to upload his valuable PDFs (once again, can't blame him really). Then, I googled something along the lines of 'pdf to booklet apps windows' and discovered <a href="https://www.bookletcreator.com/">BookletCreator</a>, which appears to be a pretty good tool for Mac and Windows. Although Bento still doesn't trust the app, he installs it, and discovers that it is a <strong>trial version</strong>! <i>And</i>, it only formats the first 16 pages!</p> 
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='shock.jpg') }}" alt="Shocked Image" width="35%">  
+  </div>
+  <div id="block">
+    <p>In fact, Bento points out that most websites have this limitation, either they only do a few pages, or they don't allow relatively big PDFs.</p>  
+  </div>
+  <div id="block">
+    <p>Hence, there does seem to be an issue here. Being able to convert your PDFs into booklets to print is a powerful tool to have, considering that you would use a quarter of the paper compared to printing each page single sided. This is obviously an <i>environmental and financial W</i>.</p>
+  </div>
+  <div id="block">
+    <p>But unfortunately, despite processing PDFs into printable booklets being a relatively <i>simple</i> thing to do (just need to move around the pages with some math and squish 2 side by side onto a single page), there does not exist a convenient, widely available resource to do so. All the <i>many</i> websites which offer this service end up falling into the trap of limiting people, in some form or another. And it's unfeasible to expect everyone to use Linux just so they can conveniently run the Python program in the terminal.</p>
+  </div>
+  <div id="block">
+    <p><strong>And thus, I told Bento to 'let me cook'.</strong></p>
+  </div>
+
+  <div id="block">
+    <h2>The cooking begins</h2>
+  </div>
+  <div id="block">
+    <p>So I'm sitting there in physics, and I'm pondering. In theory, it's probably not that hard to manipulate the PDFs into a booklet. But the issue is, I want it to be easily accessible, which means either making an app or a website. I have very little experience making an app, and also I don't want to think about tkinter or PyQt5 again. So, I guess I'm going to do a website. But then this leads to another issue!</p>
+  </div>
+  <div id="block">
+    <p>I've only ever made static sites. What that means is there's no server behind the website to process user input. I'm unable to simply upload a PDF and expect to process it with JavaScript<sup><a href="#1">[1]</a></sup>. Which kinda sucks! So then I gotta figure out how to do the following:</p>
+  </div>
+  <div id="block">
+    <ol>
+      <li>Process a PDF into a printable booklet via Python</li>
+      <li>Make this tool accessible in a way that shows it is trustworthy and incredibly easy to use</li>
+      <li>Make it affordable to provide, costing (hopefully) nothing</li>
+    </ol>
+  </div>
+
+  <div id="block">
+    <h2>Processing</h2>
+  </div>
+  <div id="block">
+    <p>It seems that, quite conveniently, pdfbook2 is, in fact, open-source! So I can literally just look at <a href="https://github.com/jenom/pdfbook2/blob/master/pdfbook2/pdfbook2">their code</a>, specifically their <strong>booklify</strong> function.</p>
+  </div>
+
+  <div id="block">
+    <pre>
+      <code>
+  def booklify(name, opts):
+    # ------------------------------------------------------ Check if file exists
+    print("\nProcessing", name)
+    if not os.path.isfile(name):
+        print("SKIP: file not found.")
+        return
+    print("Getting bounds...", end=" ")
+    sys.stdout.flush()
+
+    # ---------------------------------------------------------- useful constants
+    bboxName = b"%%HiResBoundingBox:"
+    tmpFile = ".crop-tmp.pdf"
+
+    # ------------------------------------------------- find min/max bounding box
+    if opts.crop:
+        p = subprocess.Popen(
+            ["pdfcrop", "--verbose", "--resolution", repr(opts.resolution), name, tmpFile],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        out, err = p.communicate()
+        if len(err) != 0:
+            print(err)
+            print("\n\nABORT: Problem getting bounds")
+            sys.exit(1)
+        lines = out.splitlines()
+        bboxes = [s[len(bboxName) + 1 :] for s in lines if s.startswith(bboxName)]
+        bounds = [[float(x) for x in bbox.split()] for bbox in bboxes]
+        minLOdd = min([bound[0] for bound in bounds[::2]])
+        maxROdd = max([bound[2] for bound in bounds[::2]])
+        if len(bboxes) > 1:
+            minLEven = min([bound[0] for bound in bounds[1::2]])
+            maxREven = max([bound[2] for bound in bounds[1::2]])
+        else:
+            minLEven = minLOdd
+            maxREven = maxROdd
+        minT = min([bound[1] for bound in bounds])
+        maxB = max([bound[3] for bound in bounds])
+
+        widthOdd = maxROdd - minLOdd
+        widthEven = maxREven - minLEven
+        maxWidth = max(widthOdd, widthEven)
+        minLOdd -= maxWidth - widthOdd
+        maxREven += maxWidth - widthEven
+
+        print("done")
+        sys.stdout.flush()
+
+        # --------------------------------------------- crop file to area of interest
+        print("cropping...", end=" ")
+        sys.stdout.flush()
+        p = subprocess.Popen(
+            [
+                "pdfcrop",
+                "--bbox-odd",
+                "{L} {T} {R} {B}".format(
+                    L=minLOdd - opts.innerMargin / 2,
+                    T=minT - opts.topMargin,
+                    R=maxROdd + opts.outerMargin,
+                    B=maxB + opts.outerMargin,
+                ),
+                "--bbox-even",
+                "{L} {T} {R} {B}".format(
+                    L=minLEven - opts.outerMargin,
+                    T=minT - opts.topMargin,
+                    R=maxREven + opts.innerMargin / 2,
+                    B=maxB + opts.outerMargin,
+                ),
+                "--resolution",
+                repr(opts.resolution),
+                name,
+                tmpFile,
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        out, err = p.communicate()
+        if len(err) != 0:
+            print(err)
+            print("\n\nABORT: Problem with cropping")
+            sys.exit(1)
+        print("done")
+        sys.stdout.flush()
+    else:
+        shutil.copy(name, tmpFile)
+
+    # -------------------------------------------------------- create the booklet
+    print("create booklet...", end=" ")
+    sys.stdout.flush()
+    pdfJamCallList = [
+        "pdfjam",
+        "--landscape",
+        "--suffix",
+        "book",
+        tmpFile,
+    ]
+
+    # add option signature if it is defined else booklet
+    if opts.signature != 0:
+        pdfJamCallList.append("--signature")
+        pdfJamCallList.append(repr(opts.signature))
+    else:
+        pdfJamCallList.append("--booklet")
+        pdfJamCallList.append("true")
+
+    # add option --paper to call
+    if opts.paper is not None:
+        pdfJamCallList.append("--paper")
+        pdfJamCallList.append(opts.paper)
+
+    # add option --short-edge to call
+    if opts.shortedge:
+        # check if everyshi.sty exists as texlive recommends
+        p = subprocess.Popen(
+            ["kpsewhich", "everyshi.sty"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
+        out, err = p.communicate()
+        if len(out) == 0:
+            print("\n\nABORT: The everyshi.sty latex package is needed for short-edge.")
+            sys.exit(1)
+        else:
+            pdfJamCallList.append("--preamble")
+            pdfJamCallList.append(
+                r"\usepackage{everyshi}\makeatletter\EveryShipout{\ifodd\c@page\pdfpageattr{/Rotate 180}\fi}\makeatother"
+            )
+
+    # run call to pdfJam to make booklet
+    p = subprocess.Popen(pdfJamCallList, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = p.communicate()
+
+    # -------------------------------------------- move file and remove temp file
+    os.rename(tmpFile[:-4] + "-book.pdf", name[:-4] + "-book.pdf")
+    os.remove(tmpFile)
+    print("done")
+    sys.stdout.flush()
+      </code>
+    </pre>
+  </div>
+  <div id="block">
+    <p>Notice how the function takes in the name of the pdf, and some <i>arguments</i>. I think the default arguments work best, so I'll just use them<sup><a href="#2">[2]</a></sup>. It also requires a non-standard program, <a href="https://github.com/rrthomas/pdfjam">pdfjam</a>. This is annoying, but since I'm planning on running this on a server, I get the added benefit of being able to run calls to installed programs on the server! It turns out, pdfjam is bundled with TeX Live, so I just need to remember to install it on the server I end up using.</p>
+  </div>
+  <div id="block">
+    <p>Great! So after playing around with this code and adding a file input method, I have a Python program that can convert a PDF to a printable booklet. I now need to find a way to make this more accessible to use.</p>
+  </div>
+
+  <div id="block">
+    <h2>Creating a website</h2>
+  </div>
+  <div id="block">
+    <p>So I want to turn my Python program into a website. That only means one thing... <a href="https://en.wikipedia.org/wiki/Flask_(web_framework)">Flask</a> 😣 But it's okay! Flask is really cool (not really). Using Flask, I'm able to create a quick demo using the Python program, and run it on my computer as a local server.</p>
+  </div>
+   <div id="block">
+    <video width="65%" controls>
+      <source src="{{ url_for('static', filename='demopreview.mp4') }}" type="video/mp4">
+    </video>
+  </div>
+  <div id="block">
+    <p>Awesome! Just one <i>tiny</i> issue. Do I actually just make my computer a web server? I don't think so. That costs money, and I don't have money...</p>
+  </div>
+  <div id="block">
+    <p>So I need a way to host this server on the cloud, in a way that doesn't cost money. So this is where the sponsor of this website comes in, Google!</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='googlelove.webp') }}" alt="Google love" width="35%"> 
+  </div>
+  <div id="block">
+    <p>Google is my best friend. I've been piggy-backing off Google in almost everything I've made. <a href="https://demeter.toomwn.xyz/">Demeter</a> uses <a href="https://xtai-umd.github.io/docs-viewer-demo/google.html">Google Docs</a>, my <a href="https://github.com/EddieTheEd/China">Chinese things</a> use <a href="https://pypi.org/project/gTTS/">gTTS</a> and <a href="https://pypi.org/project/googletrans/">googletrans</a>. My <a href="https://pinyin.toomwn.xyz/">pinyin tool</a> uses the <a href="https://cloud.google.com/translate?hl=en">Google Translate API</a> and so on. So of course, in my time of need, I turned to Google to help me out here. To help me turn my silly local server into a cool, awesome and (hopefully) free website!</p>
+  </div>
+
+  <div id="block">
+    <h2>Googling, containerising, docking and a lot of pain (real things happen here)</h2>
+  </div>
+  <div id="block">
+    <p>So, how on Earth do I turn a local server into a functional website? Google's <a href="https://cloud.google.com/run?hl=en">Cloud Run</a>, of course? But, how do I turn my current code into something Google can use? Well this is where <a href="https://www.docker.com/resources/what-container/">containers</a> come in. Containers are like VMs but so, so much better. Essentially, they're programs running mini OS's which have all the programs necessary to do a specific thing. In our case, we're trying to run a Flask app. How do we make containers? <a href="https://opensource.com/article/21/8/container-image">Images</a>! We need to instruct our container to install certain things, and configure it with its unique OS. We do this using an image!</p>
+  </div>
+  <div id="block">
+    <p>I used <a href="https://www.docker.com/">Docker</a> for this, but there are many alternatives around. Docker's just the most widely used.</p>
+  </div>
+  <div id="block">
+    <p>This is neat and all, but how do we actually build an image, using our current Flask app? We use Dockerfiles! Dockerfiles essentially tell Docker how we want to make our OS, what kind of specific programs and properties we want it to have. This is useful, because as I mentioned previously, running our program on a completely new installation of Debian, for example, would not work. This is because Debian doesn't have TeX Live installed by default, so we need to include this in our Dockerfile. Here it is:</p>
+  </div>
+  <div id="block">
+    <pre>
+      <code>
+FROM python:3.9-slim
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    texlive \
+    texlive-extra-utils \
+    texlive-latex-extra \
+    ghostscript \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+EXPOSE 5100
+
+CMD ["python", "app.py"]
+      </code>
+    </pre> 
+  </div>
+  <div id="block">
+    <p>What does this do? Well, if we go from a line-to-line basis:</p>
+  </div>
+  <div id="block">
+    <ol>
+      <li>Start with a slimmed down Debian image that has Python 3.9</li>
+      <li>Update the APT package list</li>
+      <li>Force install packages, avoiding installing unnecessary packages</li>
+      <li>Install TeX Live from APT</li>
+      <li>Install additional tools from TeX Live</li>
+      <li>Install Ghostscript<sup><a href="#3">[3]</a></sup></li>
+      <li>Clean APT cache. This reduces the size of the image</li>
+      <li>Removes the list of available packages to, once again, reduce the image size</li>
+      <li>Sets the working directory to be the 'app' directory</li>
+      <li>Copy the requirements.txt file</li>
+      <li>Runs pip install on the requirements.txt file, installing Flask</li>
+      <li>Copies the Flask app's code</li>
+      <li>Exposes port 5100, allowing us to interact with the container via this port</li>
+      <li>Gives the starting command for the container, which just runs the app</li>
+    </ol>
+  </div>
+  <div id="block">
+    <p>Simple enough. Now we just gotta make the image. The exact command I ran was <code>docker build -t cookingv1 .</code>, which gave me a docker image to play with!</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='imageing.png') }}" alt="Building an image" width="65%"> 
+  </div>
+  <div id="block">
+    <p>Running this image as a container and exposing a port lets me test out whether it all still works. Thankfully, it does!</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='container.png') }}" alt="Container" width="65%"> 
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='containerworking.png') }}" alt="Container working" width="65%"> 
+  </div>
+  <div id="block">
+    <p>Awesome. Time to give it to Google. This is where the pain begins.</p>
+  </div>
+
+  <div id="block">
+    <h3>The pains of reading Google documentation (just kidding)</h3>
+  </div>
+  <div id="block">
+    <p>You gotta listen very carefully here, because Google is unfortunately quite finicky.</p>
+  </div>
+  <div id="block">
+    <p>Before we actually create a container in Google's Cloud Run, we need to give Google the image we just made. Here's a guide on how to do that. Read it in full, hopefully it will save you time I lost :( Also, I'm just assuming you have a Google account and can set up Google's Cloud console or whatever it is.</p>
+  </div>
+  <div id="block">
+    <p>Firstly, we are going to create a new project.</p>
+  </div>
+  <div id="block">
+    <p>1. Select projects tab.</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='newproj1.png') }}" alt="newproj1" width="65%"> 
+  </div>
+  <div id="block">
+    <p>2. Make a new project.</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='newproj2.png') }}" alt="newproj2" width="65%"> 
+  </div>
+  <div id="block">
+    <p>3. Call it whatever you like and create it.</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='newproj3.png') }}" alt="newproj3" width="65%"> 
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='newproj4.png') }}" alt="newproj4" width="65%"> 
+  </div>
+  <div id="block">
+    <p>4. Make sure you're now working in this new project.</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='ensureworkinginnewproj.png') }}" alt="ensureworkinginnewproj" width="65%"> 
+  </div>
+  <div id="block">
+    <p>5. Navigate to Google's Artifact Registry.</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='rej1.png') }}" alt="rej1" width="65%"> 
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='rej2.png') }}" alt="rej2" width="65%"> 
+  </div>
+  <div id="block">
+    <p>6. Now you need to activate the Artifact Registry API.</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='activaterejapi.png') }}" alt="activaterejapi" width="65%"> 
+  </div>
+  <div id="block">
+    <p>7. Create a repo.</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='createrepo.png') }}" alt="createrepo" width="65%"> 
+  </div>
+  <div id="block">
+    <p>8. Name the repo. Make sure it's using Docker, and change the region. I recommend us-central1, if you're going to use a custom domain. Then, create the repo.</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='repoconfig.png') }}" alt="repoconfig" width="65%"> 
+  </div>
+  <div id="block">
+    <p>9. Open the repo.</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='openrepo.png') }}" alt="openrepo" width="65%"> 
+  </div>
+  <div id="block">
+    <p>10. Click the copy button to copy the repo link.</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='copyrepolink.png') }}" alt="copyrepolink" width="65%"> 
+  </div>
+  <div id="block">
+    <p>11. Go back to the terminal and run these commands. Be VERY CAREFUL. I forgot to do image name, and ended up wasting an hour trying to figure out where I went wrong. Please authorise first. This assumes you have gcloud CLI installed. Change the region to whatever region your repository is in. You can find these instructions in the setup instructions button on the repo page.</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='setupinst.png') }}" alt="setupinst" width="65%"> 
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='setupinst2.png') }}" alt="setupinst2" width="65%"> 
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='setupinst3.png') }}" alt="setupinst3" width="65%"> 
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='dockercommand.png') }}" alt="dockercommand" width="65%"> 
+  </div>
+  <div id="block">
+    <p>Here's an example of it working:</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='dockercommandworking.png') }}" alt="dockercommandworking" width="65%"> 
+  </div>
+  <div id="block">
+    <p>If it all went well, you should now be able to see the image in your project repo.</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='imageinrepo.png') }}" alt="imageinrepo" width="65%"> 
+  </div>
+  <div id="block">
+    <p>Awesome! We can now pass this along to Cloud Run.</p>
+  </div>
+  <div id="block">
+    <p>12. Navigate to Cloud Run and create a new service.</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='cloudrun1.png') }}" alt="cloudrun1" width="65%"> 
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='cloudrun2.png') }}" alt="cloudrun2" width="65%"> 
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='cloudrun3.png') }}" alt="cloudrun3" width="65%"> 
+  </div>
+  <div id="block">
+    <p>13. Select the image you just made.</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='addimage1.png') }}" alt="addimage1" width="65%"> 
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='addimage2.png') }}" alt="addimage2" width="65%"> 
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='addimage3.png') }}" alt="addimage3" width="65%"> 
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='addimage4.png') }}" alt="addimage4" width="65%"> 
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='addimage5.png') }}" alt="addimage5" width="65%"> 
+  </div>
+  <div id="block">
+    <p>14. Configure the service. Give it a name and a region, I recommend the same region as the image. Also, under authentication, select <code>Allow unauthenticated invocations</code>. This allows anyone to access it.</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='serviceconfig.png') }}" alt="serviceconfig" width="65%"> 
+  </div>
+  <div id="block">
+    <p>15. Open the Container settings.</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='containersettings.png') }}" alt="containersettings" width="65%"> 
+  </div>
+  <div id="block">
+    <p>16. Change the port if necessary. In my Dockerfile, I exposed port 5100 so I'll change it to that.</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='portchange.png') }}" alt="portchange" width="65%"> 
+  </div>
+  <div id="block">
+    <p>17. I recommend changing the maximum number of instances to something low, so that you don't wake up to a million dollar bill from Google.</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='antibrokemeasures.png') }}" alt="antibrokemeasures" width="65%"> 
+  </div>
+  <div id="block">
+    <p>18. Create! If you let it cook for a bit, you should see your website has been successfully created.</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='itsdone.png') }}" alt="itsdone" width="65%"> 
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='itsdonefr.png') }}" alt="itsdonefr" width="65%"> 
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='itsdonefrfr.png') }}" alt="itsdonefrfr" width="65%"> 
+  </div>
+
+  <div id="block">
+    <h2>Where to now?</h2>
+  </div>
+  <div id="block">
+    <p>Congratulations! If you followed these steps correctly, you should have a Flask application running via Google's Cloud Run. Using Cloud Run is convenient because they are very generous with their free tier, and they have an option for it not to be running when no one is using it. This will, however, mean that every time you use it, it takes a while to boot up, but a small price to pay for free-ness. I won't make instructions on what to do next, because its kinda trivial. You can go to Manage Custom Domains to add the service you created to a domain you own. If you've set up your code in a Github repository, you can also use Continuous Deployment (CI) so you don't have to push a Docker image every time you update something.</p>
+  </div>
+
+  <div id="block">
+    <h2>We must conclude.</h2>
+  </div>
+  <div id="block">
+    <p>So those are the details on how this works. Funnily enough, making this page took longer than it did to actually code the fundamentals. But Google, in its mysterious ways, prevents me from finishing anything in any timely manner. If you have any questions, feel free to email me at <a href= "mailto: ed@toomwn.xyz">ed@toomwn.xyz</a>. Goodbye for now! Bento 🥰</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='comedy.png') }}" alt="comedy" width="65%"> 
+  </div>
+
+  <div id="block">
+    <p><a href="/">Return home</a></p>
+  </div>
+
+  <div id="block">
+    <h3>Footnotes</h3>
+  </div>
+  <div id="block">
+    <ul id="footnoteslist">
+      <li><p id="1"><sup>[1]</sup> You probably could figure out a way to do it with vanilla JS. But I was already thinking of using Python to do it since pdfbook2 uses Python and I had a sneaky suspicion I could just ctrl c ctrl v their code. Which I ended up doing anyways!</p></li>
+      <li><p id="2"><sup>[2]</sup> I don't think it's worth considering having the user input their own arguments. The point of this is that it quickly makes a PDF into a printable booklet, end of story. Also it's more work for me :(</p></li>
+      <li><p id="3"><sup>[3]</sup> This may not be necessary but I can't be bothered to remove it.</p></li>
+    </ul>
+  </div>
+  
+  </body>
+</html>
+
