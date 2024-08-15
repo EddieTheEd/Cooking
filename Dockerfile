@@ -6,7 +6,7 @@ RUN apt-get update && \
     texlive-extra-utils \
     ghostscript \
     && apt-get clean && \
-    rm -rf /var/lib/apt/lists/* && \
+    rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man /usr/bin/dvisvgm /usr/bin/luajittex /usr/bin/luatex53 /usr/bin/luatex && \
     apt remove -y --no-install-recommends texlive-fonts-recommended && \
     apt remove -y --no-install-recommends openssl
 
