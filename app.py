@@ -5,6 +5,23 @@ from io import BytesIO
 from werkzeug.datastructures import FileStorage
 from flask import Flask, render_template, request, send_file
 from flask_compress import Compress
+from glob import glob
+from zipfile import ZipFile
+
+app = Flask(__name__)
+Compress(app)
+
+class Options:
+    def __init__(self, paper=None, shortedge=False, crop=True, outerMargin=40, innerMargin=150, topMargin=30, bottomMargin=30, signature=0, resolution=72):
+        self.paper = paper
+        self.shortedge = shortedge
+        self.crop = crop
+        self.outerMargin = outerMargin
+        self.innerMargin = innerMargin
+        self.topMargin = topMargin
+        self.bottomMargin = bottomMargin
+        self.signature = signature
+        self.resolution = resolution
 
 def booklify(file, opts):
     name = 'input.pdf'
@@ -125,37 +142,34 @@ def booklify(file, opts):
 
     return result_pdf
 
-app = Flask(__name__)
-Compress(app)
-
-class Options:
-    def __init__(self, paper=None, shortedge=False, crop=True, outerMargin=40, innerMargin=150, topMargin=30, bottomMargin=30, signature=0, resolution=72):
-        self.paper = paper
-        self.shortedge = shortedge
-        self.crop = crop
-        self.outerMargin = outerMargin
-        self.innerMargin = innerMargin
-        self.topMargin = topMargin
-        self.bottomMargin = bottomMargin
-        self.signature = signature
-        self.resolution = resolution
-
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
         if 'file' not in request.files:
-            return 'No file uploaded', 400
-        file = request.files['file']
-        if file.filename == '':
-            return 'No file selected', 400
-        if file:
-            original_filename = file.filename
-            base, ext = os.path.splitext(original_filename)
-            output_filename = f"{base}-book{ext}"
+            return 'No files uploaded', 400
+        
+        files = request.files.getlist('file')
+        if len(files) == 0:
+            return 'No files selected', 400
 
-            opts = Options()
-            output_pdf = booklify(file, opts)
-            return send_file(output_pdf, mimetype='application/pdf', as_attachment=True, download_name=output_filename)
+        stream = BytesIO()
+        with ZipFile(stream, 'w') as zf:
+            for file in files:
+                if file and file.filename != '':
+                    original_filename = file.filename
+                    base, ext = os.path.splitext(original_filename)
+                    output_filename = f"{base}-book{ext}"
+
+                    opts = Options()
+                    output_pdf = booklify(file, opts)
+
+                    zf.writestr(output_filename, output_pdf.getvalue())
+                else:
+                    return 'One or more files are empty', 400
+
+        stream.seek(0)
+        return send_file(stream, mimetype='application/zip', as_attachment=True, download_name='Cooking_tray.zip')
+
     return render_template('index.html')
 
 @app.route('/details')
