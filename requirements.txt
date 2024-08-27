@@ -1,2 +1,2 @@
 Flask==2.2.2
-Flask-Compress==1.40
+Flask-Compress==1.4.0
