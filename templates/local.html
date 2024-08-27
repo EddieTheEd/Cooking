@@ -36,10 +36,140 @@
     <h1 id="title">Hosting locally</h1> 
   </div>
   <div id="block">
-    <h2>Installing texlive</h2>
-    <ol>
-      <li>To be finished soon!</li>
-    </ol>
+    <h1>Windows :(</h1>
+  </div>
+  <div id="block">
+    <h2>Getting the code</h2>
+  </div>
+  <div id="block">
+    <p>To run Cooking locally, we first need to get the source code. You can do this in one of two ways: Either download it directly, or clone the repository. Note that if you choose to download, you will have to do so again if any major updates drop. But I don't really have plans for more updates so it's probably better to do this.</p>
+  </div>
+
+  <div id="block">
+    <p>I'm going to assume that if you're gonna clone the repository you're familiar with how to do that. If not, then I suggest following the <a href="https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository">Github guide</a>. So instead, I'll show you how to download the source code as a zip file.</p>
+  </div>
+  <div id="block">
+    <p>Firstly, go to <a href="https://github.com/EddieTheEd/Cooking">the Github repository</a>.</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='repopage.png') }}" alt="repopage" width="60%">  
+  </div>
+  <div id="block">
+    <p>Now, click the code button and press Download ZIP. This should download a ZIP file which I assume you should be able to extract.</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='downloadzip1.png') }}" alt="downloadzip1" width="60%">  
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='downloadzip2.png') }}" alt="downloadzip2" width="60%">  
+  </div>
+  <div id="block">
+    <p>Yippee!! Now you should have a zip file of the source code. Now, you should use an file extracting tool (e.g. WinRAR) to extract it somewhere. Please note where you've extracted it to as this will be used in the later steps!</p>
+  </div>
+  <div id="block">
+    <h2>Installing Cygwin</h2> 
+  </div>
+  <div id="block">
+    <p>Now, this is the hard part. Windows is kinda sucky in that it doesn't have a Unix-like environment. So we need to get one, and the way we do this is via Cygwin</p>
+  </div>
+  <div id="block">
+    <p>So, let's navigate to the Cygwin page.</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='cygwin.png') }}" alt="cygwin" width="60%">  
+  </div>
+  <div id="block">
+    <p>Now, download the setup executable and run it.</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='cygwin2.png') }}" alt="cygwin2" width="60%">  
+  </div>
+  <div id="block">
+    <p>This is fr the part where things can go wrong, so <strong>please read this very carefully</strong>!</p>
+  </div>
+  <div id="block">
+    <p>Follow the instructions of the installer. Use the defaults for all the options. However, STOP when its finished downloading the minimal setup for Cygwin. You should see something similar to this. Please make sure you haven't skipped past this page! If you have, abort the installation and start again.</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='cygwinpackages.png') }}" alt="cygwinpackages" width="60%">  
+  </div>
+  <div id="block">
+    <p>Awesome! If you see something similar to this page, you're on track! Now, click the Pending button (next to View) and change it to <strong>Full</strong>. Then, in the search bar, type in <code>texlive</code>.</p>
+  </div>
+  <div id="block">
+    <p>I know I said all this is really important, but this part is really really important fr (trust). We are now going to select the following packages.</p>
+  </div>
+  <div id="block">
+    <p><strong>texlive, texlive-collection-binextra, texlive-collection-latex, texlive-collection-latexextra</strong></p>
+  </div>
+  <div id="block">
+    <p>Each of these packages are essential for the program to work. Make sure to select them all, and ensure you've chosen the <strong>same version for each of the packages</strong>. As far as I'm concerned, the version starting with '2024' works.</p>
+  </div>
+  <div id="block">
+    <p>Now you can click the Next button at the bottom right.</p>
+  </div>
+  <div id="block">
+    <p>Let the Cygwin installer cook for a bit. You should be all good now! Hopefully, you have a Cygwin terminal which has all the necessary texlive packages. It should also have python installed by default. If not, re-run the setup installer, and add the python and python-pip packages.</p>
+  </div>
+  <div id="block">
+    <h2>Pip dependencies</h2>
+  </div>
+  <div id="block">
+    <p>Cooking is essentially a Flask app, so we need to install Flask in our Cygwin environment.</p>
+  </div>
+  <div id="block">
+    <p>Open up the <strong>Cygwin terminal</strong>(NOT the default Windows terminal), and cd (change directory) into the <strong>file directory of the repository</strong>. For example, If I extracted the repository to Downloads/Cooking-main (also, extracting can also add extra folders, so make sure you're in the right one! We want the one where app.py is inside it.), and my username is edwar, then I would execute the following command <strong>in Cygwin</strong>:</p>
+  </div>
+  <div id="block">
+    <p><code>cd /cygdrive/c/Users/edwar/Downloads/Cooking-main/</code></p>
+  </div>
+  <div id="block">
+    <p>If you can't find your user, then in the <strong>Cygwin terminal</strong>, run the following command and note the output.</p>
+  </div>
+  <div id="block">
+    <p><code>ls /cygdrive/c/Users/</code></p>
+  </div>
+  <div id="block">
+    <p>If you've done this correctly, then you should be in the repository directory in the Cygwin terminal. Yippee!</p>
+  </div>
+  <div id="block">
+    <p>Now, we're going to install the pip dependencies. If it says that pip isn't a command, then you need to re-run the setup installer as mentioned above. Else, please run the following command:</p>
+  </div>
+  <div id="block">
+    <p><code>pip install -r requirements.txt</code></p>
+  </div>
+  <div id="block">
+    <h2>Running locally</h2>
+  </div>
+  <div id="block">
+    <p>Now for the moment of truth!!!! In the <strong>same Cygwin terminal</strong>(or after cd'ing to the same directory), run this command:</p>
+  </div>
+  <div id="block">
+    <p><code>flask run</code></p>
+  </div>
+  <div id="block">
+    <p>If all has gone well, it should look something like this (photo taken in Linux):</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='flaskrunn.png') }}" alt="flaskrun" width="60%">  
+  </div>
+  <div id="block">
+    <p>Open that link (http://127.0.0.1:5000) and tada! It's cooking.toomwn.xyz, but running on your computer! This should make it much more faster than the one online, since it's using your (presumably) good computer's resources, as opposed to the horrendous CPU and RAM I've given it. Enjoy cooking up some spicy pdfs!</p>
+  </div>
+  <div id="block">
+    <h1>Mac/Linux</h1>
+  </div>
+  <div id="block">
+    <p>Use your brain</p>
+  </div>
+  <div id="block">
+    <h2>Concludy</h2>
+  </div>
+  <div id="block">
+    <p>I highly suggest you guys run cooking.toomwn.xyz on your own computer, especially if you plan to convert many files. Not only is it a lot faster, but also it saves me money :)</p>
+  </div>
+  <div id="block">
+    <p>Also, sorry Kento :( I tried my best to reduce the size of the things needed to be installed. But unfortunately, it turns out you <strong>have</strong> to use Cygwin to run a few of the necessary texlive programs. :((((((</p>
   </div>
 
   <div id="block">
