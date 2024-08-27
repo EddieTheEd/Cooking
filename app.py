@@ -24,8 +24,8 @@ class Options:
         self.resolution = resolution
 
 def booklify(file, opts):
-    name = 'input.pdf'
-    tmpFile = 'crop-tmp.pdf'
+    name = os.path.join(os.getcwd(), 'input.pdf')
+    tmpFile = os.path.join(os.getcwd(), 'crop-tmp.pdf')
 
     file.save(name)
 
@@ -130,15 +130,16 @@ def booklify(file, opts):
     p = subprocess.Popen(pdfJamCallList, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate()
 
-    output_file_name = tmpFile[:-4] + "-book.pdf"
-    os.rename(output_file_name, name[:-4] + "-book.pdf")
+    output_file_name = os.path.join(os.getcwd(), tmpFile[:-4] + "-book.pdf")
+    final_output_name = os.path.join(os.getcwd(), name[:-4] + "-book.pdf")
+    os.rename(output_file_name, final_output_name)
 
     with open(name[:-4] + "-book.pdf", "rb") as f:
         result_pdf = BytesIO(f.read())
 
-    os.remove(name)
-    os.remove(tmpFile)
-    os.remove(name[:-4] + "-book.pdf")
+    os.remove(os.path.join(os.getcwd(), name))
+    os.remove(os.path.join(os.getcwd(), tmpFile))
+    os.remove(final_output_name)
 
     return result_pdf
 
@@ -179,6 +180,10 @@ def details():
 @app.route('/explainer')
 def explainer():
     return render_template('explainer.html')
+
+@app.route('/local')
+def local():
+    return render_template('local.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True, port=5100)
