@@ -1,2 +1,2 @@
-flask
-Flask-Compress
+Flask==2.2.2
+Flask-Compress==1.40
