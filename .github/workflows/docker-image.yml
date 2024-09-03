@@ -4,22 +4,25 @@ on:
     branches:
       - main
 jobs:
-    build:
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v4
-        - name: Sign into Dockerhub 
-          id: docker-hub
-          env:
-            username: ${{secrets.DOCKERHUB_USERNAME}}
-            password: ${{secrets.DOCKERHUB_PASSWORD}}
-          run: |
-            docker login -u $username -p $password 
-        - name: Build the Docker image
-          id: build-docker-image
-          run: |
-            ls -la 
-            docker build . -f Dockerfile ${{secrets.DOCKERHUB_USERNAME}}/cooking:latest
-        - name: Push the Docker image
-          id: push-docker-image
-          run: docker push ${{secrets.DOCKERHUB_USERNAME}}/cooking:latest
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Sign into DockerHub
+        id: docker-hub
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+        run: |
+          echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+
+      - name: Build the Docker image
+        id: build-docker-image
+        run: |
+          ls -la
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/cooking:latest .
+
+      - name: Push the Docker image
+        id: push-docker-image
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/cooking:latest
