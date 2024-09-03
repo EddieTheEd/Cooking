@@ -20,6 +20,15 @@
           padding-left: 10%;
           padding-right: 10%;
         }
+        div {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          font-family: Arial, sans-serif; 
+          padding-left: 10%;
+          padding-right: 10%;
+        }
         p {
           margin: 5px;
         }
@@ -36,7 +45,7 @@
     <h1 id="title">Hosting locally</h1> 
   </div>
   <div id="block">
-    <h1>Windows :(</h1>
+    <h1>Windows :( (the very stupid way)</h1>
   </div>
   <div id="block">
     <h2>Getting the code</h2>
@@ -155,6 +164,36 @@
   </div>
   <div id="block">
     <p>Open that link (http://127.0.0.1:5000) and tada! It's cooking.toomwn.xyz, but running on your computer! This should make it much more faster than the one online, since it's using your (presumably) good computer's resources, as opposed to the horrendous CPU and RAM I've given it. Enjoy cooking up some spicy pdfs!</p>
+  </div>
+  <div id="block">
+    <h1>Windows (the intellectual method (might be bigger file size but oh well))</h1>
+  </div>
+  <div id="block">
+    <p>For this method (the intellectual, smarter method), we are going to use the prepared Docker image that is automatically built by the Github repository. But to actually use this image, we are going to install Docker Desktop!</p>
+  </div>
+  <div>
+    <h2>Docker Desktop real gaming</h2>
+  </div>
+  <div>
+    First, search up 'Docker desktop download' or something like that and navigate to the download page for Docker Desktop. Just FYI, all the images I'm gonna use have been taken on a Linux environment, because I really can't be bothered to pull up my virtual machine.
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='dockerdesktopdownload.png') }}" alt="dockerdesktopdownload" width="60%">  
+  </div>
+  <div>
+    <p>Note that you should download the Docker Desktop version that is compatible with your Windows computer's infrastructure! Generally, this is gonna be x86-64. Unless you're a bit crazy.</p>
+  </div>
+  <div>
+    <p>Next, follow the instructions to install Docker Desktop. Use the recommended settings.</p>
+  </div>
+  <div>
+    <p>You can skip making an account, because it's not actually that necessary. Just skip all the survey things and you should be looking at something similar to this:</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='dockerimagepage.png') }}" alt="dockerimagepage" width="60%">  
+  </div>
+  <div>
+    <p>Ok, poggies! Now, press Ctrl+K to access the search. Then, type in <code>edditheeed/cooking</code>. You should see something like this.</p>
   </div>
   <div id="block">
     <h1>Mac/Linux</h1>

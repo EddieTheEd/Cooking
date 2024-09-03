@@ -153,23 +153,33 @@ def upload_file():
         if len(files) == 0:
             return 'No files selected', 400
 
-        stream = BytesIO()
-        with ZipFile(stream, 'w') as zf:
-            for file in files:
-                if file and file.filename != '':
-                    original_filename = file.filename
-                    base, ext = os.path.splitext(original_filename)
-                    output_filename = f"{base}-book{ext}"
+        if len(files) == 1:
+            original_filename = files[0].filename
+            base, ext = os.path.splitext(original_filename)
+            output_filename = f"{base}-book{ext}"
 
-                    opts = Options()
-                    output_pdf = booklify(file, opts)
+            opts = Options()
+            output_pdf = booklify(files[0], opts)
+            return send_file(output_pdf, mimetype='application/pdf', as_attachment=True, download_name=output_filename)
 
-                    zf.writestr(output_filename, output_pdf.getvalue())
-                else:
-                    return 'One or more files are empty', 400
+        else:
+            stream = BytesIO()
+            with ZipFile(stream, 'w') as zf:
+                for file in files:
+                    if file and file.filename != '':
+                        original_filename = file.filename
+                        base, ext = os.path.splitext(original_filename)
+                        output_filename = f"{base}-book{ext}"
 
-        stream.seek(0)
-        return send_file(stream, mimetype='application/zip', as_attachment=True, download_name='Cooking_tray.zip')
+                        opts = Options()
+                        output_pdf = booklify(file, opts)
+
+                        zf.writestr(output_filename, output_pdf.getvalue())
+                    else:
+                        return 'One or more files are empty', 400
+
+            stream.seek(0)
+            return send_file(stream, mimetype='application/zip', as_attachment=True, download_name='Cooking_tray.zip')
 
     return render_template('index.html')
 
