@@ -41,6 +41,17 @@
     </style>
 </head>
 <body>
+  <script>
+    window.addEventListener('beforeunload', () => sessionStorage.setItem('scrollPos', window.scrollY));
+    window.addEventListener('load', () => {
+      const pos = sessionStorage.getItem('scrollPos');
+      if (pos !== null) {
+        window.scrollTo(0, parseInt(pos, 10));
+        sessionStorage.removeItem('scrollPos');
+      }
+    });
+  </script>
+
   <div id="block">
     <h1 id="title">Hosting locally</h1> 
   </div>
@@ -172,9 +183,6 @@
     <p>For this method (the intellectual, smarter method), we are going to use the prepared Docker image that is automatically built by the Github repository. But to actually use this image, we are going to install Docker Desktop!</p>
   </div>
   <div>
-    <h2>Docker Desktop real gaming</h2>
-  </div>
-  <div>
     First, search up 'Docker desktop download' or something like that and navigate to the download page for Docker Desktop. Just FYI, all the images I'm gonna use have been taken on a Linux environment, because I really can't be bothered to pull up my virtual machine.
   </div>
   <div id="block">
@@ -196,10 +204,70 @@
     <p>Ok, poggies! Now, press Ctrl+K to access the search. Then, type in <code>edditheeed/cooking</code>. You should see something like this.</p>
   </div>
   <div id="block">
+    <img src="{{ url_for('static', filename='dockerlookup.png') }}" alt="dockerlookup" width="60%">  
+  </div>
+  <div>
+    <p>We are going to pull the image from <code>edditheeed/cooking</code>. Make sure it's the latest one! (It will say 'latest') If you want to get the latest version, you will have to pull the latest image.</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='pulldockerimage.png') }}" alt="pulldockerimage" width="60%">  
+  </div>
+  <div>
+    <p>If you're successful, you should see something like this.</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='successfulpullingfrnocap.png') }}" alt="successfulpullingfrnocap" width="60%">  
+  </div>
+  <div>
+    <p>If you're reached this stage then tada! You now can run cooking.toomwn.xyz on your computer! Press the Run button and configure the optional settings.</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='runcontainer.png') }}" alt="runcontainer" width="60%">  
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='example.png') }}" alt="example" width="60%">  
+  </div>
+  <div>
+    <p>After running the container, you should see something like this. Press the 2nd link from the top (which should be http://localhost:<code>{ the 4 numbers you typed}</code>), eg. <a href="https://interburbul.toomwn.xyz/">http://localhost:6969</a>.</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='opencontainerlink.png') }}" alt="opencontainerlink" width="60%">  
+  </div>
+  <div>
+    <p>Lo and behold, if all has gone well, you should be looking at your very own cooking.toomwn.xyz, hosted on your computer!</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='cookinglocally.png') }}" alt="cookinglocally" width="60%">  
+  </div>
+  <div>
+    <p>Now, you can use cooking.toomwn.xyz any time you want! Even if you don't have internet! Just open Docker Desktop, navigate to the <code>Containers</code> section, and restart the container. Then, return back to the same link as before. Enjoy!</p>
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='reopen1.png') }}" alt="reopen1" width="60%">  
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='reopen2.png') }}" alt="reopen2" width="60%">  
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='reopen3.png') }}" alt="reopen3" width="60%">  
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='reopen4.png') }}" alt="reopen4" width="60%">  
+  </div>
+  <div id="block">
+    <img src="{{ url_for('static', filename='reopen5.png') }}" alt="reopen5" width="60%">  
+  </div>
+  <div>
+    <p>This concludes my TED-talk on how run cooking.toomwn.xyz locally with Windows.</p>
+  </div>
+  <div>
+    <p><strong>Note that the exact same process will work for Mac and Linux, you just need to obviously not install the Windows version of Docker Desktop.</strong> Containers truly are a magical thing.</p>  
+  </div>
+  <div id="block">
     <h1>Mac/Linux</h1>
   </div>
   <div id="block">
-    <p>Use your brain</p>
+    <p>Use your brain (see the bolded note above lol)</p>
   </div>
   <div id="block">
     <h2>Concludy</h2>

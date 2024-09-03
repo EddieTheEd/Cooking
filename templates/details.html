@@ -48,6 +48,16 @@
     </style>
 </head>
 <body>
+  <script>
+    window.addEventListener('beforeunload', () => sessionStorage.setItem('scrollPos', window.scrollY));
+    window.addEventListener('load', () => {
+      const pos = sessionStorage.getItem('scrollPos');
+      if (pos !== null) {
+        window.scrollTo(0, parseInt(pos, 10));
+        sessionStorage.removeItem('scrollPos');
+      }
+    });
+  </script>
   <div id="block">
     <h1 id="title">The details</h1> 
   </div>
